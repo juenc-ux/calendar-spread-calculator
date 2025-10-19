@@ -5,182 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar Spread Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: linear-gradient(to right, #93c5fd, #6366f1);
-            outline: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-            border: none;
-        }
-    </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100">
     <div class="max-w-6xl mx-auto p-6">
         <div class="bg-white rounded-lg shadow-lg p-8">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-4xl font-bold mb-2">Calendar Spread Calculator</h1>
-                    <p class="text-gray-600">Forward Volatility, Forward Factor & Calendar Spread Pricing</p>
-                </div>
-                <div class="flex gap-3">
-                    <select id="pricingModel" class="px-4 py-2 rounded-lg font-semibold bg-white border border-blue-300 text-gray-900">
-                        <option value="blackscholes">Black-Scholes</option>
-                        <option value="black76">Black-76</option>
-                        <option value="binomial">Binomial</option>
-                    </select>
-                    <button id="darkModeBtn" class="p-2 rounded-lg bg-gray-200 text-gray-800">🌙</button>
-                </div>
-            </div>
+            <h1 class="text-4xl font-bold mb-2">Calendar Spread Calculator</h1>
+            <p class="text-gray-600 mb-8">Forward Volatility and Calendar Spread Pricing</p>
 
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <!-- Left Column - Inputs -->
                 <div class="lg:col-span-1 space-y-4">
                     <h2 class="text-lg font-bold mb-4">Parameters</h2>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Ticker Symbol</label>
-                        <input type="text" id="ticker" placeholder="e.g. AAPL" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
-                    </div>
-
+                    
                     <div>
                         <label class="block text-sm font-semibold mb-2">Expiration 1</label>
                         <input type="date" id="date1" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold mb-2">Expiration 2</label>
                         <input type="date" id="date2" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold mb-2">IV Exp 1 (%)</label>
                         <input type="number" id="iv1" value="50" step="0.1" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold mb-2">IV Exp 2 (%)</label>
                         <input type="number" id="iv2" value="40" step="0.1" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold mb-2">Stock Price</label>
                         <input type="number" id="spotPrice" value="100" step="0.01" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold mb-2">Strike</label>
                         <input type="number" id="strikePrice" value="100" step="0.01" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
                     <div>
                         <label class="block text-sm font-semibold mb-2">Risk-Free Rate (%)</label>
                         <input type="number" id="riskFreeRate" value="4" step="0.01" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Dividend (%)</label>
-                        <input type="number" id="dividend" value="0" step="0.01" class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg">
-                    </div>
-
-                    <button onclick="calculateResults()" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition-all">
-                        Calculate
-                    </button>
+                    <button onclick="calculate()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">Calculate</button>
                 </div>
 
-                <!-- Right Column - Results -->
-                <div class="lg:col-span-3" id="resultsContainer" style="display:none;">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                        <div class="border-2 border-green-500 bg-green-50 p-4 rounded-lg">
-                            <p class="text-xs opacity-75 mb-1">Forward Volatility</p>
-                            <p class="text-3xl font-bold text-green-600" id="forwardVolPct">0%</p>
-                            <p class="text-xs opacity-75 mt-2" id="dteDisplay">0-0 DTE</p>
+                <div id="results" class="lg:col-span-3" style="display:none;">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-green-50 border-2 border-green-500 p-4 rounded-lg">
+                            <p class="text-xs text-gray-600">Forward Volatility</p>
+                            <p class="text-3xl font-bold text-green-600" id="forwardVol">0%</p>
                         </div>
-                        
-                        <div class="border-4 p-4 rounded-lg" id="ffBox">
-                            <p class="text-xs opacity-75 mb-1">Forward Factor</p>
-                            <p class="text-3xl font-bold" id="forwardFactor">0%</p>
-                            <p class="text-xs opacity-75 mt-2" id="ffStatus">Below threshold</p>
+                        <div class="bg-yellow-50 border-4 border-yellow-500 p-4 rounded-lg">
+                            <p class="text-xs text-gray-600">Forward Factor</p>
+                            <p class="text-3xl font-bold text-yellow-600" id="forwardFac">0%</p>
                         </div>
                     </div>
 
-                    <!-- TARGET PRICE FOR FF 30% -->
-                    <div class="border-4 border-red-600 bg-red-50 p-6 rounded-lg mb-4">
+                    <div class="bg-red-50 border-4 border-red-600 p-6 rounded-lg mb-4">
                         <p class="text-lg font-bold mb-4">TARGET PRICE FOR FF 30%</p>
                         <div class="grid grid-cols-2 gap-6">
-                            <div class="border-2 border-red-400 p-4 rounded">
-                                <p class="text-sm font-semibold mb-2">CALL SPREAD</p>
-                                <div class="text-center">
-                                    <p class="text-5xl font-bold text-red-600" id="maxCallFF30">$0.00</p>
-                                    <p class="text-xs opacity-75 mt-2">Max Entry Price</p>
-                                </div>
+                            <div class="bg-white border-2 border-red-400 p-4 rounded">
+                                <p class="text-sm font-semibold mb-2">CALL</p>
+                                <p class="text-4xl font-bold text-red-600" id="callFF30">$0.00</p>
                             </div>
-                            <div class="border-2 border-red-400 p-4 rounded">
-                                <p class="text-sm font-semibold mb-2">PUT SPREAD</p>
-                                <div class="text-center">
-                                    <p class="text-5xl font-bold text-red-600" id="maxPutFF30">$0.00</p>
-                                    <p class="text-xs opacity-75 mt-2">Max Entry Price</p>
-                                </div>
+                            <div class="bg-white border-2 border-red-400 p-4 rounded">
+                                <p class="text-sm font-semibold mb-2">PUT</p>
+                                <p class="text-4xl font-bold text-red-600" id="putFF30">$0.00</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CURRENT SPREADS -->
-                    <div class="border-4 border-blue-600 bg-blue-50 p-6 rounded-lg mb-4">
-                        <p class="text-lg font-bold mb-4">CURRENT CALENDAR SPREADS</p>
+                    <div class="bg-blue-50 border-4 border-blue-600 p-6 rounded-lg">
+                        <p class="text-lg font-bold mb-4">CURRENT SPREADS</p>
                         <div class="grid grid-cols-2 gap-6">
-                            <div class="border-2 border-blue-400 p-4 rounded">
-                                <p class="text-sm font-semibold mb-2">CALL SPREAD</p>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between">
-                                        <span>Current Price:</span>
-                                        <span class="font-bold text-2xl text-blue-600" id="callSpreadCurrent">$0.00</span>
-                                    </div>
-                                    <div class="flex justify-between text-xs opacity-75">
-                                        <span>For FF 0%:</span>
-                                        <span class="font-semibold" id="callSpreadFF0">$0.00</span>
-                                    </div>
-                                </div>
+                            <div class="bg-white border-2 border-blue-400 p-4 rounded">
+                                <p class="text-sm font-semibold">CALL: <span id="callCurr">$0.00</span></p>
+                                <p class="text-xs text-gray-600 mt-2">FF 0%: <span id="callFF0">$0.00</span></p>
                             </div>
-                            <div class="border-2 border-pink-400 p-4 rounded">
-                                <p class="text-sm font-semibold mb-2">PUT SPREAD</p>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between">
-                                        <span>Current Price:</span>
-                                        <span class="font-bold text-2xl text-pink-600" id="putSpreadCurrent">$0.00</span>
-                                    </div>
-                                    <div class="flex justify-between text-xs opacity-75">
-                                        <span>For FF 0%:</span>
-                                        <span class="font-semibold" id="putSpreadFF0">$0.00</span>
-                                    </div>
-                                </div>
+                            <div class="bg-white border-2 border-pink-400 p-4 rounded">
+                                <p class="text-sm font-semibold">PUT: <span id="putCurr">$0.00</span></p>
+                                <p class="text-xs text-gray-600 mt-2">FF 0%: <span id="putFF0">$0.00</span></p>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Trade History -->
-                    <div id="historyContainer" style="display:none;" class="border-2 border-gray-200 p-4 rounded-lg">
-                        <p class="font-semibold mb-3">Trade History (last 10)</p>
-                        <div id="historyList" class="text-sm space-y-2 max-h-40 overflow-y-auto"></div>
                     </div>
                 </div>
             </div>
@@ -188,156 +92,79 @@
     </div>
 
     <script>
-        // Set default dates
-        function setDefaultDates() {
-            const today = new Date();
-            let date1 = new Date(today);
-            let date2 = new Date(today);
-            
-            // Find next Friday for date1
-            while (date1.getDay() !== 5) {
-                date1.setDate(date1.getDate() + 1);
-            }
-            
-            // Find second Friday for date2
-            date2 = new Date(date1);
-            date2.setDate(date2.getDate() + 7);
-            
-            document.getElementById('date1').valueAsDate = date1;
-            document.getElementById('date2').valueAsDate = date2;
-        }
-        setDefaultDates();
-
-        // Normal Distribution CDF
         function normDist(x) {
-            const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+            const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, p=0.3275911;
             const sign = x < 0 ? -1 : 1;
             x = Math.abs(x) / Math.sqrt(2);
             const t = 1.0 / (1.0 + p * x);
-            const y = 1.0 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x));
+            const y = 1.0 - (((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
             return 0.5 * (1.0 + sign * y);
         }
 
-        // Black-Scholes
-        function blackScholesCall(S, K, T, r, sigma, q = 0) {
-            if (T <= 0 || sigma <= 0) return Math.max(S - K, 0);
-            const sqrtT = Math.sqrt(T);
-            const d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
-            const d2 = d1 - sigma * sqrtT;
-            return S * Math.exp(-q * T) * normDist(d1) - K * Math.exp(-r * T) * normDist(d2);
+        function bs_call(S, K, T, r, sig, q=0) {
+            if (T <= 0 || sig <= 0) return Math.max(S - K, 0);
+            const st = Math.sqrt(T);
+            const d1 = (Math.log(S/K) + (r-q+0.5*sig*sig)*T)/(sig*st);
+            const d2 = d1 - sig*st;
+            return S*Math.exp(-q*T)*normDist(d1) - K*Math.exp(-r*T)*normDist(d2);
         }
 
-        function blackScholesPut(S, K, T, r, sigma, q = 0) {
-            if (T <= 0 || sigma <= 0) return Math.max(K - S, 0);
-            const sqrtT = Math.sqrt(T);
-            const d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
-            const d2 = d1 - sigma * sqrtT;
-            return K * Math.exp(-r * T) * normDist(-d2) - S * Math.exp(-q * T) * normDist(-d1);
+        function bs_put(S, K, T, r, sig, q=0) {
+            if (T <= 0 || sig <= 0) return Math.max(K - S, 0);
+            const st = Math.sqrt(T);
+            const d1 = (Math.log(S/K) + (r-q+0.5*sig*sig)*T)/(sig*st);
+            const d2 = d1 - sig*st;
+            return K*Math.exp(-r*T)*normDist(-d2) - S*Math.exp(-q*T)*normDist(-d1);
         }
 
-        function calculateResults() {
-            try {
-                const date1 = new Date(document.getElementById('date1').value);
-                const date2 = new Date(document.getElementById('date2').value);
-                
-                if (date2 <= date1) {
-                    alert('Expiration 2 must be after Expiration 1');
-                    return;
-                }
-
-                const now = new Date();
-                const d1_16NY = new Date(date1);
-                d1_16NY.setHours(22, 0, 0, 0);
-                const d2_16NY = new Date(date2);
-                d2_16NY.setHours(22, 0, 0, 0);
-
-                const msPerDay = 24 * 60 * 60 * 1000;
-                const daysToExp1 = (d1_16NY - now) / msPerDay;
-                const daysToExp2 = (d2_16NY - now) / msPerDay;
-
-                if (daysToExp1 <= 0 || daysToExp2 <= 0) {
-                    alert('Expiration date is in the past');
-                    return;
-                }
-
-                const T1 = daysToExp1 / 365;
-                const T2 = daysToExp2 / 365;
-
-                const v1 = parseFloat(document.getElementById('iv1').value) / 100;
-                const v2 = parseFloat(document.getElementById('iv2').value) / 100;
-                const S = parseFloat(document.getElementById('spotPrice').value);
-                const K = parseFloat(document.getElementById('strikePrice').value);
-                const r = parseFloat(document.getElementById('riskFreeRate').value) / 100;
-                const q = parseFloat(document.getElementById('dividend').value) / 100;
-
-                // Forward Vol
-                const numerator = (T2 * v2 * v2) - (T1 * v1 * v1);
-                const denominator = T2 - T1;
-                
-                if (numerator < 0) {
-                    alert('Invalid IV combination');
-                    return;
-                }
-
-                const forwardVol = Math.sqrt(numerator / denominator);
-                const forwardFactor = (v1 / forwardVol) - 1;
-
-                // Option prices
-                const callT1 = blackScholesCall(S, K, T1, r, v1, q);
-                const callT2 = blackScholesCall(S, K, T2, r, v2, q);
-                const putT1 = blackScholesPut(S, K, T1, r, v1, q);
-                const putT2 = blackScholesPut(S, K, T2, r, v2, q);
-
-                // FF 30%
-                const requiredForwardVol30 = v1 / 1.30;
-                const iv2Sq30 = (requiredForwardVol30 * requiredForwardVol30 * (T2 - T1) + T1 * v1 * v1) / T2;
-                const requiredIV230 = Math.sqrt(Math.max(0, iv2Sq30));
-                const callT2At30 = blackScholesCall(S, K, T2, r, requiredIV230, q);
-                const putT2At30 = blackScholesPut(S, K, T2, r, requiredIV230, q);
-
-                // FF 0%
-                const iv2Sq0 = (v1 * v1 * (T2 - T1) + T1 * v1 * v1) / T2;
-                const requiredIV20 = Math.sqrt(Math.max(0, iv2Sq0));
-                const callT2At0 = blackScholesCall(S, K, T2, r, requiredIV20, q);
-                const putT2At0 = blackScholesPut(S, K, T2, r, requiredIV20, q);
-
-                // Display results
-                document.getElementById('forwardVolPct').textContent = (forwardVol * 100).toFixed(2) + '%';
-                document.getElementById('dteDisplay').textContent = daysToExp1.toFixed(2) + '-' + daysToExp2.toFixed(2) + ' DTE';
-                document.getElementById('forwardFactor').textContent = (forwardFactor * 100).toFixed(2) + '%';
-                
-                const ffNum = forwardFactor * 100;
-                const ffBox = document.getElementById('ffBox');
-                if (ffNum >= 30) {
-                    ffBox.className = 'border-4 p-4 rounded-lg bg-green-100 border-green-500 text-green-900';
-                    document.getElementById('ffStatus').textContent = '✓ RECOMMENDED';
-                } else if (ffNum >= 16) {
-                    ffBox.className = 'border-4 p-4 rounded-lg bg-yellow-100 border-yellow-500 text-yellow-900';
-                    document.getElementById('ffStatus').textContent = '✓ Good';
-                } else {
-                    ffBox.className = 'border-4 p-4 rounded-lg bg-gray-50 border-gray-300';
-                    document.getElementById('ffStatus').textContent = 'Below threshold';
-                }
-
-                document.getElementById('maxCallFF30').textContent = '$' + Math.max(0, callT2At30 - callT1).toFixed(2);
-                document.getElementById('maxPutFF30').textContent = '$' + Math.max(0, putT2At30 - putT1).toFixed(2);
-                document.getElementById('callSpreadCurrent').textContent = '$' + (callT2 - callT1).toFixed(2);
-                document.getElementById('putSpreadCurrent').textContent = '$' + (putT2 - putT1).toFixed(2);
-                document.getElementById('callSpreadFF0').textContent = '$' + (callT2At0 - callT1).toFixed(2);
-                document.getElementById('putSpreadFF0').textContent = '$' + (putT2At0 - putT1).toFixed(2);
-
-                document.getElementById('resultsContainer').style.display = 'grid';
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
+        function calculate() {
+            const d1 = new Date(document.getElementById('date1').value);
+            const d2 = new Date(document.getElementById('date2').value);
+            const now = new Date();
+            
+            d1.setHours(22,0,0,0);
+            d2.setHours(22,0,0,0);
+            
+            const dt1 = (d1 - now) / (24*60*60*1000);
+            const dt2 = (d2 - now) / (24*60*60*1000);
+            const T1 = dt1/365, T2 = dt2/365;
+            
+            const v1 = parseFloat(document.getElementById('iv1').value)/100;
+            const v2 = parseFloat(document.getElementById('iv2').value)/100;
+            const S = parseFloat(document.getElementById('spotPrice').value);
+            const K = parseFloat(document.getElementById('strikePrice').value);
+            const r = parseFloat(document.getElementById('riskFreeRate').value)/100;
+            
+            const num = T2*v2*v2 - T1*v1*v1;
+            const fvol = Math.sqrt(num/(T2-T1));
+            const ff = (v1/fvol - 1)*100;
+            
+            document.getElementById('forwardVol').textContent = (fvol*100).toFixed(2) + '%';
+            document.getElementById('forwardFac').textContent = ff.toFixed(2) + '%';
+            
+            const c1 = bs_call(S, K, T1, r, v1);
+            const c2 = bs_call(S, K, T2, r, v2);
+            const p1 = bs_put(S, K, T1, r, v1);
+            const p2 = bs_put(S, K, T2, r, v2);
+            
+            const rv30 = v1/1.3;
+            const iv2_30 = Math.sqrt((rv30*rv30*(T2-T1) + T1*v1*v1)/T2);
+            const c2_30 = bs_call(S, K, T2, r, iv2_30);
+            const p2_30 = bs_put(S, K, T2, r, iv2_30);
+            
+            const iv2_0 = Math.sqrt((v1*v1*(T2-T1) + T1*v1*v1)/T2);
+            const c2_0 = bs_call(S, K, T2, r, iv2_0);
+            const p2_0 = bs_put(S, K, T2, r, iv2_0);
+            
+            document.getElementById('callFF30').textContent = '$' + Math.max(0, c2_30-c1).toFixed(2);
+            document.getElementById('putFF30').textContent = '$' + Math.max(0, p2_30-p1).toFixed(2);
+            document.getElementById('callCurr').textContent = '$' + (c2-c1).toFixed(2);
+            document.getElementById('putCurr').textContent = '$' + (p2-p1).toFixed(2);
+            document.getElementById('callFF0').textContent = '$' + (c2_0-c1).toFixed(2);
+            document.getElementById('putFF0').textContent = '$' + (p2_0-p1).toFixed(2);
+            
+            document.getElementById('results').style.display = 'grid';
         }
-
-        // Dark mode
-        document.getElementById('darkModeBtn').addEventListener('click', function() {
-            document.body.classList.toggle('bg-gray-900');
-            document.querySelector('.bg-white').classList.toggle('bg-gray-800');
-            document.querySelector('.bg-white').classList.toggle('text-white');
-        });
     </script>
 </body>
 </html>
